@@ -24,7 +24,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Scrape Foldoo
-        run: python scrape_foldoo.py
+        run: python scrape_official.py
 
       - name: Commit if changed
         run: |

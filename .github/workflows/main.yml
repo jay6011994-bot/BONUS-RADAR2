@@ -2,11 +2,12 @@ name: 每週更新特價
 
 on:
   schedule:
+    # 每週一 05:00 UTC(荷蘭夏令 07:00 / 冬令 06:00)。cron 用 UTC。
     - cron: "0 5 * * 1"
-  workflow_dispatch: {}
+  workflow_dispatch: {}   # 也可在 Actions 頁面手動按「Run workflow」
 
 permissions:
-  contents: write
+  contents: write         # 允許把更新後的 JSON commit 回 repo
 
 jobs:
   update:
@@ -23,16 +24,17 @@ jobs:
       - name: Install deps
         run: pip install -r requirements.txt
 
-      - name: Scrape Foldoo
+      - name: Scrape official APIs (AH/Jumbo/Lidl/Kruidvat)
         run: python scrape_official.py
 
       - name: Commit if changed
         run: |
-          git config user.name "bonus-radar-bot"
+          git config user.name  "bonus-radar-bot"
           git config user.email "actions@github.com"
           if [ -n "$(git status --porcelain data/deals.json)" ]; then
             git add data/deals.json
-            git commit -m "update deals"
+            git commit -m "update deals $(date -u +%Y-%m-%d)"
+            git pull --rebase origin main
             git push
             echo "done"
           else
